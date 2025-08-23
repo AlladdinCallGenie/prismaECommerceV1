@@ -1,0 +1,37 @@
+import swaggerJsdoc from "swagger-jsdoc";
+
+const options: swaggerJsdoc.Options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "E-Commerce API",
+      version: "1.0.0",
+      description: "API documentation for the e-commerce backend",
+    },
+    servers: [
+      {
+        url: " http://192.168.102.134:4000/",
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  apis: [
+    "./src/*.ts", // JSDoc in route files
+  ],
+};
+
+const swaggerSpec = swaggerJsdoc(options);
+export default swaggerSpec;

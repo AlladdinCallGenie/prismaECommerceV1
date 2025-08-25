@@ -2,15 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../config/config";
 import bcrypt from "bcrypt";
 
-// GET ALL USERS
-export const getAllUsers = async (req: Request, res: Response) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to Fetch all users..." });
-  }
-};
+
 
 // UPDATE LOGGEDIN USER
 export const updateUser = async (req: Request, res: Response) => {
@@ -53,7 +45,6 @@ export const deleteUser = async (req: Request, res: Response) => {
     await prisma.user.delete({
       where: { id: id },
     });
-    console.log("got this id:- ", id);
     res.status(200).json({ message: "User deleted successfully!.. " });
   } catch (error) {
     res.status(500).json({ error: "Failed to Delete the user..." });

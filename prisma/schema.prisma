@@ -20,6 +20,7 @@ model User {
   first_name   String
   last_name    String
   password     String
+  isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
   last_login   DateTime @updatedAt
   refreshToken String?
@@ -62,6 +63,8 @@ model Products {
   discount      Float?
   image         String
   isActive      Boolean       @default(true)
+  isDeleted     Boolean       @default(false)
+  isDeletedAt   DateTime?
   cart_items    Cart_items[]
   order_items   Order_items[]
   category      Category      @relation(fields: [category_id], references: [id], onDelete: Cascade)
@@ -84,7 +87,7 @@ model Shopping_cart {
 }
 
 model Cart_items {
-  cart_item_id Int @id @default(autoincrement())
+  cart_item_id Int   @id @default(autoincrement())
   cart_id      Int
   product_id   Int
   quantity     Int
@@ -97,7 +100,7 @@ model Cart_items {
 model Order_table {
   order_id           Int           @id @default(autoincrement())
   userId             Int
-  shippingAddress_id Int           
+  shippingAddress_id Int
   order_date         DateTime      @default(now())
   total_amount       Float
   status             Status        @default(PENDING)
@@ -114,7 +117,7 @@ enum Status {
 }
 
 model Order_items {
-  order_item_id Int @id @default(autoincrement())
+  order_item_id Int   @id @default(autoincrement())
   order_id      Int
   product_id    Int
   quantity      Int

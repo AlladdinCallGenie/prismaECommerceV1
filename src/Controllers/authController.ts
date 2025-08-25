@@ -90,3 +90,12 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: " Login Failed .........." });
   }
 };
+
+//LOGOUT USER
+export const logoutUser = async (req: Request, res: Response) => {
+  try {
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: "Can't log you out ..." });
+  }
+};

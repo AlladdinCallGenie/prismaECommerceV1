@@ -19,7 +19,9 @@ export const placeOrder = async (req: Request, res: Response) => {
       where: { address_id, userId },
     });
     if (!address)
-      return res.status(400).json({ error: "Invalid Shipping address..." });
+      return res.status(400).json({
+        error: "Invalid Shipping address OR No Shipping Address Found...",
+      });
 
     const totalAmount = cart.cart_items.reduce(
       (sum, item) => sum + item.price,
@@ -29,29 +31,52 @@ export const placeOrder = async (req: Request, res: Response) => {
     let finalAmount = totalAmount;
     let discountAmount = 0;
     let couponId: number | null = null;
-    
-    if(couponCode) {
-      const coupon = await prisma.coupon.findUnique({where:{code:couponCode}});
 
-      if(!coupon || !coupon.isActive) {
-        return res.status(400).json({error:"Invalid or Inactive coupon code ..."})
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({
+        where: { code: couponCode },
+      });
+
+      if (!coupon || !coupon.isActive) {
+        return res
+          .status(400)
+          .json({ error: "Invalid or Inactive coupon code ..." });
       }
 
-      const now = new Date()
-      if(now < coupon.validFrom || now > coupon.validTo) {
-        return res.status(400).json({message:"Coupon expired or not yet valid..."})
+      const now = new Date();
+      if (now < coupon.validFrom || now > coupon.validTo) {
+        return res
+          .status(400)
+          .json({ message: "Coupon expired or not yet valid..." });
       }
 
       if (coupon.minOrderValue && totalAmount < coupon.minOrderValue) {
-        return res.status(400).json({ error: "Order does not meet coupon requirements" });
+        return res
+          .status(400)
+          .json({ error: "Order does not meet coupon requirements" });
       }
+
+      //calculate discount l
+      if (coupon.discountType === "PERCENTAGE") {
+        discountAmount = (totalAmount * coupon.discountValue) / 100;
+      } else if (coupon.discountType === "FIXED") {
+        discountAmount = coupon.discountValue;
+      }
+      if(discountAmount > totalAmount) {
+        return res.status(400).json({error: "Discount cannot exceed order total"})
+      }
+      finalAmount = totalAmount - discountAmount;
+      couponId = coupon.id;
     }
-    
+    // creating order with discount information...
     const order = await prisma.order_table.create({
       data: {
         userId,
         shippingAddress_id: address.address_id,
         total_amount: totalAmount,
+        final_amount: finalAmount,
+        discount_amount: discountAmount,
+        couponId: couponId,
         order_items: {
           create: cart.cart_items.map((item) => ({
             product_id: item.product_id,
@@ -60,13 +85,13 @@ export const placeOrder = async (req: Request, res: Response) => {
           })),
         },
       },
-      include: { order_items: true },
+      include: { order_items: true, coupon: true },
     });
 
     await prisma.cart_items.deleteMany({ where: { cart_id: cart.cart_id } });
     return res
       .status(201)
-      .json({ message: "Order created successfully ", order });
+      .json({ message: "Order placed successfully ", order });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Failed to place the order..." });

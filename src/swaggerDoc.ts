@@ -991,6 +991,7 @@
  * /api/order/placeOrder:
  *   post:
  *     summary: Place a new order from the logged-in user's cart
+ *     description: Creates an order using items from the user's cart. Optionally applies a coupon for discounts.
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
@@ -1006,6 +1007,11 @@
  *               address_id:
  *                 type: integer
  *                 description: The shipping address ID to deliver the order
+ *                 example: 1
+ *               couponCode:
+ *                 type: string
+ *                 description: Optional coupon code to apply discount
+ *                 example: SAVE10
  *     responses:
  *       201:
  *         description: Order created successfully
@@ -1016,14 +1022,77 @@
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: Order placed successfully
  *                 order:
  *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     userId:
+ *                       type: integer
+ *                     shippingAddress_id:
+ *                       type: integer
+ *                     total_amount:
+ *                       type: number
+ *                       example: 500
+ *                     final_amount:
+ *                       type: number
+ *                       example: 450
+ *                     discount_amount:
+ *                       type: number
+ *                       example: 50
+ *                     couponId:
+ *                       type: integer
+ *                       nullable: true
+ *                     order_items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           product_id:
+ *                             type: integer
+ *                           quantity:
+ *                             type: integer
+ *                           price:
+ *                             type: number
+ *                     coupon:
+ *                       type: object
+ *                       nullable: true
  *       400:
- *         description: Cart is empty or invalid shipping address
+ *         description: Bad request - e.g. empty cart, invalid address, coupon errors
+ *         content:
+ *           application/json:
+ *             examples:
+ *               EmptyCart:
+ *                 value:
+ *                   error: Cart is empty
+ *               InvalidAddress:
+ *                 value:
+ *                   error: Invalid Shipping address OR No Shipping Address Found...
+ *               InvalidCoupon:
+ *                 value:
+ *                   error: Invalid or Inactive coupon code ...
+ *               CouponExpired:
+ *                 value:
+ *                   message: Coupon expired or not yet valid...
+ *               MinOrderNotMet:
+ *                 value:
+ *                   error: Order does not meet coupon requirements
+ *               DiscountExceedsTotal:
+ *                 value:
+ *                   error: Discount cannot exceed order total
  *       401:
- *         description: Login required
+ *         description: Unauthorized - login required
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Login first..
  *       500:
  *         description: Failed to place the order
+ *         content:
+ *           application/json:
+ *             example:
+ *               error: Failed to place the order...
  */
 
 /**

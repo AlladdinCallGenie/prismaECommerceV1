@@ -103,10 +103,14 @@ model Order_table {
   shippingAddress_id Int
   order_date         DateTime      @default(now())
   total_amount       Float
+  discount_amount    Float?
+  final_amount       Float?
   status             Status        @default(PENDING)
   user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   user_address       User_address  @relation(fields: [shippingAddress_id], references: [address_id], onDelete: Cascade)
   order_items        Order_items[]
+  couponId           Int?
+  coupon             Coupon?       @relation(fields: [couponId], references: [id])
 }
 
 enum Status {
@@ -125,4 +129,25 @@ model Order_items {
 
   order_table Order_table @relation(fields: [order_id], references: [order_id])
   products    Products    @relation(fields: [product_id], references: [product_id])
+}
+
+model Coupon {
+  id            Int          @id @default(autoincrement())
+  code          String       @unique
+  description   String?
+  discountType  DiscountType // PERCENTAGE or FIXED
+  discountValue Float
+  minOrderValue Float? // optional: min order value to apply coupon
+  maxDiscount   Float? // optional: cap for percentage discounts
+  validFrom     DateTime     @default(now())
+  validTo       DateTime
+  isActive      Boolean      @default(true)
+
+  // One coupon can be applied to many orders
+  orders Order_table[]
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
 }

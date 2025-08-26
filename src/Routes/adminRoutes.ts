@@ -10,13 +10,18 @@ import {
   softDeleteProductById,
   reActivateProductById,
   getAdminAllProducts,
+  deleteById,
   getAllUsers,
   getUserById,
   updateUserById,
   deleteUser,
   getCtgryById,
   getAllCtgry,
-  allOrders
+  allOrders,
+  addCoupon,
+  deleteCoupon,
+  updateCoupon,
+  reactivateCoupon,
 } from "../Controllers/adminControllers";
 const router = Router();
 
@@ -29,12 +34,13 @@ router.get("/allCtgry", isAuthenticated, isAdmin, getAllCtgry);
 
 // ---------->Admin Order Routes<----------
 router.put("/updateStatus/:id", isAuthenticated, isAdmin, updateStatus); // Tested
-router.get("/allOrders", isAuthenticated, isAdmin, allOrders); 
+router.get("/allOrders", isAuthenticated, isAdmin, allOrders);
 
 // ---------->Admin Product Routes<----------
 router.post("/newProduct", isAuthenticated, isAdmin, createProduct); // Tested
 router.put("/update/:id", isAuthenticated, isAdmin, updateProductById); // Tested
 router.delete("/delete/:id", isAuthenticated, isAdmin, softDeleteProductById); // Tested
+router.delete("/permanentdelete/:id", isAuthenticated, isAdmin, deleteById); // Tested
 router.post("/activate/:id", isAuthenticated, isAdmin, reActivateProductById); // Tested
 router.get("/all", isAuthenticated, isAdmin, getAdminAllProducts);
 
@@ -43,5 +49,11 @@ router.get("/allUsers", isAuthenticated, isAdmin, getAllUsers); //Tested
 router.get("/getById/:userId", isAuthenticated, isAdmin, getUserById);
 router.put("/updateById/:userId", isAuthenticated, isAdmin, updateUserById);
 router.delete("/delete/:userId", isAuthenticated, isAdmin, deleteUser);
+
+// --------------> Admin Coupon Routes <----------------------
+router.post("/createCoupon", isAuthenticated, isAdmin, addCoupon);
+router.put("/updateCoupon/:id", isAuthenticated, isAdmin, updateCoupon);
+router.delete("/deleteCoupon/:id", isAuthenticated, isAdmin, deleteCoupon);
+router.put("/activateCoupon/:id", isAuthenticated, isAdmin, reactivateCoupon);
 
 export default router;

@@ -210,6 +210,11 @@ export const softDeleteProductById = async (req: Request, res: Response) => {
 export const reActivateProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const isProduct = await prisma.products.findUnique({
+      where: { product_id: Number(id) },
+    });
+    if (!isProduct)
+      return res.status(401).json({ message: " Product not Found... " });
     await prisma.products.update({
       where: { product_id: Number(id) },
       data: { isActive: true },
@@ -219,6 +224,20 @@ export const reActivateProductById = async (req: Request, res: Response) => {
       .json({ message: "product activated successfully..." });
   } catch (error) {
     res.status(500).json({ error: "Failed to re Activate Product..." });
+  }
+};
+export const deleteById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const isProduct = await prisma.products.findUnique({
+      where: { product_id: Number(id) },
+    });
+    if (!isProduct)
+      return res.status(404).json({ message: " Product not Found... " });
+    await prisma.products.delete({ where: { product_id: Number(id) } });
+    res.status(200).json({ message: "Product permanently deleted" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete Product..." });
   }
 };
 
@@ -258,9 +277,9 @@ export const updateUserById = async (req: Request, res: Response) => {
       return res
         .status(404)
         .json({ message: `User with id #${userId} not found....` });
-    const validUserRoles = [" ADMIN", "CUSTOMER"];
-    if (role && !role.includes(validUserRoles))
-      return res.status(400).json({ message: "Invalid Role value" });
+    const validUserRoles = ["ADMIN", "CUSTOMER"];
+    // if (role.includes(validUserRoles))                                 // Needs improvments
+    //   return res.status(400).json({ message: "Invalid Role value" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const updatedUser = await prisma.user.update({
@@ -276,6 +295,7 @@ export const updateUserById = async (req: Request, res: Response) => {
     });
     res.status(200).json({ updatedUser });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to update User... " });
   }
 };
@@ -297,5 +317,120 @@ export const deleteUser = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "User deleted successfully...." });
   } catch (error) {
     return res.status(500).json({ error: "Cant delete User .... " });
+  }
+};
+
+// -------------> COUPONS <-----------------------
+
+export const addCoupon = async (req: Request, res: Response) => {
+  try {
+    const {
+      code,
+      description,
+      discountType,
+      discountValue,
+      minOrderValue,
+      maxDiscount,
+      validTo,
+    } = req.body;
+    const isCode = await prisma.coupon.findUnique({ where: { code } });
+    if (isCode)
+      return res.status(400).json({ message: "Coupon already exists..." });
+    const coupon = await prisma.coupon.create({
+      data: {
+        code,
+        description,
+        discountType,
+        discountValue,
+        minOrderValue,
+        maxDiscount,
+        validTo,
+      },
+    });
+    return res.status(200).json({ message: "Coupon created successfully... " });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Cant Add Coupon for some reason .... " });
+  }
+};
+export const updateCoupon = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const {
+      code,
+      description,
+      discountType,
+      discountValue,
+      minOrderValue,
+      maxDiscount,
+      validTo,
+    } = req.body;
+    const isCoupon = await prisma.coupon.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!isCoupon)
+      return res.status(400).json({ message: "Coupon does not exists..." });
+    const updatedCoupon = await prisma.coupon.update({
+      where: { id: Number(id) },
+      data: {
+        code,
+        description,
+        discountType,
+        discountValue,
+        minOrderValue,
+        maxDiscount,
+        validTo,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "Updated Coupon:- ", updatedCoupon });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Cannot update coupon due to some reason.." });
+  }
+};
+export const deleteCoupon = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const coupon = await prisma.coupon.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!coupon)
+      return res.status(404).json({ message: "No coupon with given ID... " });
+    await prisma.coupon.update({
+      where: { id: Number(id) },
+      data: { isActive: false },
+    });
+    return res.status(200).json({ message: "Coupon deleted successfully... " });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Cant Delete Coupon for some reason .... " });
+  }
+};
+export const reactivateCoupon = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const isCoupon = await prisma.coupon.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!isCoupon)
+      return res.status(400).json({ message: "Coupon does not exists..." });
+    const updatedCoupon = await prisma.coupon.update({
+      where: { id: Number(id) },
+      data: {
+        isActive: true,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "Coupon reactivated successfully..." });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Cannot reactivate coupon due to some reason.." });
   }
 };

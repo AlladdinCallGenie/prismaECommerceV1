@@ -29,7 +29,7 @@ const options: swaggerJsdoc.Options = {
     ],
   },
   apis: [
-    "./src/*.ts", // JSDoc in route files
+    "./src/*.ts", // JSDoc in src folder
   ],
 };
 

@@ -37,24 +37,3 @@ app.use("/api/auth", authRoutes);
 app.listen(PORT, () => {
   console.log(`server is listening on http://localhost:${PORT}`);
 });
-
-/**
- * {
-  "message": "LoggedIn Successfull...",
-  "loggedInUser": {
-    "id": 9,
-    "username": "muhid165",
-    "email": "shaikhmuhid165@gmail.com",
-    "first_name": "muhid",
-    "last_name": "shaikh",
-    "password": "$2b$10$eAXhS6DlrDgQvK1Fj1sfz.MxLQEYiOWoCqTkIq6R8MSL/KnMxVjWi",
-    "isDeleted": false,
-    "createdAt": "2025-08-20T09:06:51.734Z",
-    "last_login": "2025-08-25T11:35:59.882Z",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwiaWF0IjoxNzU2MTIxNzU5LCJleHAiOjE3NTY3MjY1NTl9.iWjbicHCbA31kY-aBfAvR6rLhNZEazt9O6LVhmSeJkw",
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoYWlraG11aGlkMTY1QGdtYWlsLmNvbSIsImlhdCI6MTc1NjEyMTc1OSwiZXhwIjoxNzU2MTI1MzU5fQ.GjTJ3vcNgZ0_LktU1htePlhqrc_fjU2bTkU02C-_zxA",
-    "role": "ADMIN"
-  }
-}
- */
-

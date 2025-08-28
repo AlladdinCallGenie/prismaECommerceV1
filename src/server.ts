@@ -36,10 +36,6 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/auth", authRoutes);
 
-app.get("/fail", async (req, res) => {
-  throw new Error("Something broke");
-});
-
 app.listen(PORT, () => {
   console.log(`server is listening on http://localhost:${PORT}`);
 });

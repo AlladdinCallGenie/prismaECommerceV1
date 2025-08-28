@@ -653,7 +653,7 @@
 
 /**
  * @swagger
- * /api/admin/delete/{userId}:
+ * /api/admin/deleteUser/{userId}:
  *   delete:
  *     summary: Soft delete a user by ID (set isDeleted = true)
  *     tags: [Admin User]
@@ -845,6 +845,61 @@
  *         description: Forbidden (not an admin)
  *       500:
  *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/admin/allCoupons:
+ *   get:
+ *     summary: Get all coupons
+ *     description: Fetches all available coupons. Only accessible by admin users.
+ *     tags: [Admin Coupon]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all coupons
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allCoupons:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       code:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       discountType:
+ *                         type: string
+ *                         enum: [PERCENTAGE, FIXED]
+ *                       discountValue:
+ *                         type: number
+ *                       minOrderValue:
+ *                         type: number
+ *                       maxDiscount:
+ *                         type: number
+ *                       validFrom:
+ *                         type: string
+ *                         format: date-time
+ *                       validTo:
+ *                         type: string
+ *                         format: date-time
+ *                       isActive:
+ *                         type: boolean
+ *       401:
+ *         description: Unauthorized - Login required
+ *       403:
+ *         description: Forbidden - Only admin can access
+ *       404:
+ *         description: No coupons found
+ *       500:
+ *         description: Server error
  */
 
 /**
@@ -1455,4 +1510,61 @@
  *         description: Not logged in
  *       500:
  *         description: Failed to add address
+ */
+
+/**
+ * @swagger
+ * /api/admin/allPaginatedDate:
+ *   get:
+ *     summary: Get paginated list of products
+ *     description: Returns a paginated list of products for admin with page and limit query params.
+ *     tags: [Admin Product]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items per page
+ *     responses:
+ *       200:
+ *         description: Successfully fetched paginated products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 page:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *                 totalItems:
+ *                   type: integer
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       price:
+ *                         type: number
+ *       401:
+ *         description: Unauthorized - Login required
+ *       403:
+ *         description: Forbidden - Only admin can access
+ *       500:
+ *         description: Server error
  */

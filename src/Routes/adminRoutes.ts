@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { isAuthenticated } from "../Middlewares/userAuth";
 import { isAdmin } from "../Middlewares/isAdmin";
+import { paginateData } from "../Utils/pagination";
 import {
   createCategory,
   deleteCategory,
@@ -22,6 +23,7 @@ import {
   deleteCoupon,
   updateCoupon,
   reactivateCoupon,
+  allCoupon,
 } from "../Controllers/adminControllers";
 const router = Router();
 
@@ -48,12 +50,15 @@ router.get("/all", isAuthenticated, isAdmin, getAdminAllProducts);
 router.get("/allUsers", isAuthenticated, isAdmin, getAllUsers); //Tested
 router.get("/getById/:userId", isAuthenticated, isAdmin, getUserById);
 router.put("/updateById/:userId", isAuthenticated, isAdmin, updateUserById);
-router.delete("/delete/:userId", isAuthenticated, isAdmin, deleteUser);
+router.delete("/deleteUser/:userId", isAuthenticated, isAdmin, deleteUser);
 
 // --------------> Admin Coupon Routes <----------------------
 router.post("/createCoupon", isAuthenticated, isAdmin, addCoupon);
 router.put("/updateCoupon/:id", isAuthenticated, isAdmin, updateCoupon);
 router.delete("/deleteCoupon/:id", isAuthenticated, isAdmin, deleteCoupon);
 router.put("/activateCoupon/:id", isAuthenticated, isAdmin, reactivateCoupon);
+router.get("/allCoupons", isAuthenticated, isAdmin, allCoupon);
 
+// --------------> Admin Paginated Routes <----------------------
+router.get("/allPaginatedDate", isAuthenticated, isAdmin, paginateData); // Test route for pagination
 export default router;

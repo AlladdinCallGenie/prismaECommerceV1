@@ -10,7 +10,7 @@ export const createCategory = async (req: Request, res: Response) => {
       where: { name },
     });
     if (category)
-      return res.status(401).json({ message: "Categtory already exists.. " });
+      return res.status(400).json({ message: "Categtory already exists.. " });
 
     const newCategory = await prisma.category.create({
       data: { name },
@@ -29,7 +29,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
       where: { id: Number(id) },
     });
     if (!isCategory)
-      return res.status(401).json({ message: " Category not Found... " });
+      return res.status(404).json({ message: " Category not Found... " });
     await prisma.category.delete({
       where: { id: Number(id) },
     });
@@ -432,5 +432,17 @@ export const reactivateCoupon = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ message: "Cannot reactivate coupon due to some reason.." });
+  }
+};
+export const allCoupon = async (req: Request, res: Response) => {
+  try {
+    const allCoupons = await prisma.coupon.findMany();
+    if (!allCoupons || allCoupons.length === 0)
+      return res.status(404).json({ message: "No coupons here!.." });
+    return res.status(200).json({ allCoupons });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Cant Display All coupons now ..." });
   }
 };

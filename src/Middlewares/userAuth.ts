@@ -10,8 +10,13 @@ export const isAuthenticated = async (
   res: Response,
   next: NextFunction
 ) => {
-  const accessToken = req.headers.authorization?.split(" ")[1];
-  if (accessToken) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader)
+    return res.status(401).json({ message: "Please login first.. " });
+
+  const accessToken = authHeader.split(" ")[1];
+
+  try {
     const decoded = jwt.verify(accessToken, JWT_ACCESS_SECRET) as JwtPayload;
 
     const existingUser = await prisma.user.findUnique({
@@ -24,8 +29,8 @@ export const isAuthenticated = async (
 
     req.user = existingUser;
     return next();
-  } else {
-    refreshAccessToken(req, res, next);
+  } catch (error) {
+    return refreshAccessToken(req, res, next);
   }
 };
 
@@ -37,7 +42,7 @@ async function refreshAccessToken(
   try {
     const incomingRefreshToken = req.body.refreshToken;
     if (!incomingRefreshToken)
-      return res.status(401).json({ message: "Login First......." });
+      return res.status(401).json({ message: "Please Login again......." });
 
     const decodedToken = jwt.verify(
       incomingRefreshToken,
@@ -69,6 +74,8 @@ async function refreshAccessToken(
     req.user = user;
     return next();
   } catch (error) {
-    return res.status(403).json({ message: "Could not refresh token" });
+    return res
+      .status(403)
+      .json({ message: "Invalid or Expired refresh token" });
   }
 }

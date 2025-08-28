@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
 import express from "express";
 import cors from "cors";
+import errorHandler from "./Middlewares/errorHandler";
 import userRoutes from "./Routes/userRoutes";
 import productsRoutes from "./Routes/productsRoutes";
 // import categoryRoutes from "./Routes/categoryRoutes";
@@ -22,9 +23,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-app.use(express.json());
 app.use(logger("dev"));
+app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(errorHandler);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
@@ -33,6 +35,10 @@ app.use("/api/products", productsRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/auth", authRoutes);
+
+app.get("/fail", async (req, res) => {
+  throw new Error("Something broke");
+});
 
 app.listen(PORT, () => {
   console.log(`server is listening on http://localhost:${PORT}`);
